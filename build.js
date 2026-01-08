@@ -7,6 +7,28 @@ const POSTS_DIR = path.join(__dirname, 'posts');
 const TEMPLATES_DIR = path.join(__dirname, 'templates');
 const DIST_DIR = path.join(__dirname, 'dist');
 
+function parseDateToTimestamp(value) {
+  if (!value) return 0;
+  const date = value instanceof Date ? value : new Date(value);
+  const time = date.getTime();
+  return Number.isNaN(time) ? 0 : time;
+}
+
+function formatDate(value) {
+  if (!value) return '';
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return trimmed;
+    const date = new Date(trimmed);
+    if (!Number.isNaN(date.getTime())) return date.toISOString().slice(0, 10);
+    return trimmed;
+  }
+
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toISOString().slice(0, 10);
+}
+
 // Ensure dist directory exists
 if (!fs.existsSync(DIST_DIR)) {
   fs.mkdirSync(DIST_DIR, { recursive: true });
@@ -21,14 +43,16 @@ function getPosts() {
     const content = fs.readFileSync(filePath, 'utf-8');
     const { data, content: body } = matter(content);
     const slug = file.replace('.md', '');
+    const dateRaw = data.date || '';
 
     return {
       slug,
       title: data.title || slug,
-      date: data.date || '',
+      date: formatDate(dateRaw),
+      dateSort: parseDateToTimestamp(dateRaw),
       content: marked(body)
     };
-  }).sort((a, b) => new Date(b.date) - new Date(a.date));
+  }).sort((a, b) => b.dateSort - a.dateSort);
 }
 
 // Read template file
