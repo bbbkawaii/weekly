@@ -88,6 +88,15 @@ body::before {
   z-index: 0;
 }
 
+/* Article page - simple paper background */
+body.article-page {
+  background: var(--paper);
+}
+
+body.article-page::before {
+  display: none;
+}
+
 /* ===== Layout Container ===== */
 .container {
   max-width: 800px;

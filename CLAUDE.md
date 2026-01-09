@@ -30,3 +30,4 @@ npm run build        # Build static HTML to dist/
 ## Development Guidelines
 
 After making code changes, commit and push to GitHub.
+use frontend-design skill
